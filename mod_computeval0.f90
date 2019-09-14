@@ -6,7 +6,8 @@ module mod_computeval0
   use mod_JP_pension
   use mod_utility
   use mod_integral
-
+  use mod_compexp
+  
   implicit none
 
 contains
@@ -52,10 +53,6 @@ contains
     real(8) :: penacc1, penacc2
     real(8) :: nextPIA, nextpenbenpred, penbenpred
 
-    real(8) :: bequestutils
-
-    real(8) :: Evtgood, Evtbad
-
     integer(8) ::checkAIME, checkW, checkA, i
 
     cashonhand = ss + income + A
@@ -67,75 +64,15 @@ contains
 
     call ass(age, currentB, income, C, laborincome, A, ss, nextperiodassets)
 
-!    call computepenaccrue(age, ageshift, laborincome, penacc1)
-!    nextPIA = computePIA(nextperiodAIME)
-!    nextpenbenpred = predictpensionbenefits(nextPIA, penbensstart+1)
-!    penbenpred = predictpensionbenefits(PIA, penbensstart+1)
-!    penacc2 = nextpenbenpred - penbenpred
-!    penacc2=penacc2*gvec(age-bornage+1)
-!    nextperiodassets=nextperiodassets+penacc1-penacc2
-
     utils = U(C, H, particip, M, nonsep)
 
-    bequestutils = beq(nextperiodassets, nonsep)
-
     call nextwage(age, W, M, hlogwage, ulogwage, hhgr, hugr, uhgr, uugr, wtpogood, wtpobad)
-    Evtgood = integral(age, nextperiodassets, wtpogood, nextperiodAIME, Vgood, Astate, Wstate, AIMEstate, currentB)
-    Evtbad = integral(age, nextperiodassets, wtpobad, nextperiodAIME, Vbad, Astate, Wstate, AIMEstate, currentB)
-    !write(*,*) 'Evtgood=', Evtgood
-    !write(*,*) 'Evtbad=', Evtbad
 
-    if(M == 0.0_8) then
-       Evtpo = ((1.0_8-mortality_good(age-30+1))*((1.0_8-good_to_bad(age-30+1))*Evtgood &
-            + good_to_bad(age-30+1)*Evtbad) + mortality_good(age-30+1)*bequestutils)
-    else if (M==1.0_8) then
-       Evtpo = ((1.0_8-mortality_bad(age-30+1))*((1.0_8-bad_to_bad(age-30+1))*Evtgood &
-            +bad_to_bad(age-30+1)*Evtbad) + mortality_bad(age-30+1)*bequestutils)
-    else
-       write(*,*) 'Health is neither 0 nor 1!!'
-    end if
-
+    call compexp(age, M, nextperiodassets, wtpogood, wtpobad, nextperiodAIME, &
+         & Vgood, Vbad, Astate, Wstate, AIMEstate, currentB, &
+         & mortality_good, mortality_bad, good_to_bad, bad_to_bad, Evtpo)
+    
     val = utils + p_beta*Evtpo
-
-!    if (val<vpanish .and. flag/=1_1) then
-!
-!       write(*,*) 'W=', W
-!
-!       do i = 1, AIMEnum-1
-!          if (AIMEstate(i)<=nextperiodAIME .and. nextperiodAIME<=AIMEstate(i+1)) then
-!             write(*,*) 'AIMEstate', i
-!             checkAIME = i
-!             exit
-!          end if
-!       end do
-!
-!       write(*,*) 'Asset=', nextperiodassets
-!       do i = 1, Anum-1
-!          if (Astate(i)<=nextperiodassets .and. nextperiodassets<=Astate(i+1)) then
-!             write(*,*) 'Astate', i
-!             checkA = i
-!             exit
-!          end if
-!       end do
-!
-!       do i = 1, Wnum-1
-!          if (Wstate(i)<wtpogood .and. wtpogood<=Wstate(i+1)) then
-!             write(*,*) 'Wstate', i
-!             checkW = i
-!             exit
-!          end if
-!       end do
-!
-!       write(*,*) 'Vgood'
-!       write(*,*) Vgood(age-bornage+2, checkAIME, checkW, checkA, 1_8)
-!
-!       write(*,*) 'Evtpo=', Evtpo, 'Evtbad=', Evtbad, 'Evtgood=', Evtgood
-!       write(*,*) 'nextperiodassets=', nextperiodassets, 'nextperiodAIME=', nextperiodAIME, 'wtpogood=', wtpogood
-!       write(*,*) 'flag=', flag
-      !write(*,*) 'Vbad'
-      !write(*,*) Vbad
-!       read*
-!    end if
 
     if (flag==1_1) then
        val = vpanish
@@ -160,7 +97,7 @@ contains
        write(*,*) '******'
        write(*,*) nextperiodAIME !!Astate, Wstate, AIMEstate, currentB
        val = vpanish
-       write(*,*) mortality_good(age-30+1)
+    nnn   write(*,*) mortality_good(age-30+1)
        write(*,*) 'asset', nextperiodassets, 'C', C
        write(*,*) 'H', H, 'particip', particip, 'currentB=', currentB
        write(*,*) 'M', M, 'nonsep', nonsep

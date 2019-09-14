@@ -9,7 +9,8 @@ module mod_optmum2
   use mod_utility
   use mod_interp
   use mod_sprob
-
+  use mod_compexp
+  
   implicit none
 
 contains
@@ -39,15 +40,14 @@ contains
     real(8) :: PIA, ss, pb, laborincome, income, cashonhand, borrowamount
     real(8) :: Cstate(Cnum), C, Cmin, Cmax
     !real(8) :: C, Cmin, Cmax
-    real(8) :: nextperiodassets, utils, bequestutils
+    real(8) :: nextperiodassets, utils
     real(8) :: MTR, reduc
-    real(8) :: Evtgood, Evtbad, Evtpo, val
+    real(8) :: Evtpo, val
 
     valopt = vpanish
 
     currentB = 1_8
-    PIA = computePIA(AIME)
-    ss = PIA
+    ss = AIME
 !    pb = predictpensionbenefits(PIA, age)
 !    pb = 2*pb
     pb = 0.0_8
@@ -78,8 +78,6 @@ contains
 
        if (cashonhand - Astate(1) < cfloor) then
           C = cfloor
-
-!          nextperiodassets = Astate(1)
       end if
 
        call ass(age, currentB, income, C, laborincome, A, ss, nextperiodassets)
@@ -89,26 +87,10 @@ contains
        end if
 
        utils = U(C, 0.0_8, 0_1, M, nonsep)
-!       utils = log(C)
 
-       bequestutils = beq(nextperiodassets, nonsep)
-
-       Evtgood = interp(age, nextperiodassets, 0.0_8, AIME, Vgood, Astate, Wstate, AIMEstate, Asnum, Wnum, AIMEnum, currentB)
-       Evtbad = interp(age, nextperiodassets, 0.0_8, AIME, Vbad, Astate, Wstate, AIMEstate, Asnum, Wnum, AIMEnum, currentB)
-!       write(*,*) Evt
-
-       if (M==0.0_8) then
-
-          Evtpo = ((1.0_8 - mortality_good(age-30+1))*((1.0_8-good_to_bad(age-30+1))*Evtgood &
-               & + good_to_bad(age-30+1)*Evtbad))+ mortality_good(age-30+1)*bequestutils
-       else if (M==1.0_8) then
-
-          Evtpo = ((1.0_8 - mortality_bad(age-30+1))*((1.0_8-bad_to_bad(age-30+1))*Evtgood &
-               & + bad_to_bad(age-30+1)*Evtbad))+ mortality_bad(age-30+1)*bequestutils
-       else
-          write(*,*) 'Health is neither 0 nor 1!!'
-          Evtpo = 0.0_8
-       end if
+       call compexp(age, M, nextperiodassets, 0.0_8, 0.0_8, nextperiodAIME, &
+       & Vgood, Vbad, Astate, Wstate, AIMEstate, currentB, &
+       & mortality_good, mortality_bad, good_to_bad, bad_to_bad, Evtpo)
 
        val = utils + p_beta*Evtpo
 

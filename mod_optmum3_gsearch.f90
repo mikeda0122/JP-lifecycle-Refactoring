@@ -7,7 +7,8 @@ module mod_optmum3_gsearch
   use mod_ass
   use mod_pension
   use mod_utility
-
+  use mod_compexp
+  
   implicit none
 
 contains
@@ -36,12 +37,11 @@ contains
     real(8) :: PIA, ss, pb, laborincome, income, cashonhand
     real(8) :: nextperiodassets, utils, bequestutils
     real(8) :: MTR, reduc
-    real(8) :: val
+    real(8) :: Evtpo, val
 
     valopt = -10000000000.0_8
 
-    PIA = computePIA(AIME)
-    ss = PIA
+    ss = AIME
 !    pb = predictpensionbenefits(PIA, age)
 !    pb = pb*2
     pb = 0.0_8
@@ -55,10 +55,6 @@ contains
     Cmin = cfloor
     Cmax = cashonhand
 
-!    do i = 1, Cnum
-!       Cstate(i) = Cmin + (i-1)*(Cmax-Cmin)/(Cnum-1)
-!    end do
-
     do Ci = 1, Cnum
       if (Cstate(Ci)>cashonhand) exit
 
@@ -71,11 +67,13 @@ contains
        call ass(age, 1_8, income, C, laborincome, A, ss, nextperiodassets)
 
        utils = U(C, 3.0_8, 0_1, M, nonsep)
-!       utils = log(C)
 
-       bequestutils = beq(nextperiodassets, nonsep)
+       call compexp(age, M, nextperiodassets, 0.0_8, 0.0_8, 0.0_8, &
+       & 0.0_8, 0.0_8, Astate, Wstate, AIMEstate, 0.0_8, &
+       & 0.0_8, 0.0_8, 0.0_8, 0.0_8, Evtpo)
+       !!We need to make sure whether the way I dealt with Vgood and Vbad is correct.
 
-       val = utils + p_beta*bequestutils
+       val = utils + p_beta*Evtpo
 
        if (val > valopt) then
           Copt = C

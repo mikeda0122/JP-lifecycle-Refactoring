@@ -7,7 +7,8 @@ module mod_computeval1
   use mod_computePIA
   use mod_utility
   use mod_integral
-
+  use mod_compexp
+  
   implicit none
 
 contains
@@ -51,8 +52,8 @@ contains
     real(8) :: earlyretirement, makeadjust
     real(8) :: penacc1, penacc2, nextpenbenpred, penbenpred, nextPIA
 
-    real(8) :: utils, bequestutils
-    real(8) :: Evtgood, Evtbad, Evtpo
+    real(8) :: utils
+    real(8) :: Evtpo
 
     cashonhand = ss + income + A
     flag = 0_1
@@ -94,33 +95,14 @@ contains
        nextperiodAIME = nextperiodAIME*earlyretirement
     end if
 
-!    call computepenaccrue(age, ageshift, laborincome, penacc1)
-!    nextPIA = computePIA(nextperiodAIME)
-!    nextpenbenpred = predictpensionbenefits(nextPIA, penbensstart+1)
-!    penbenpred = predictpensionbenefits(PIA, penbensstart+1)
-!    penacc2 = nextpenbenpred - penbenpred
-!    penacc2=penacc2*gvec(age-bornage+1)
-!    nextperiodassets=nextperiodassets+penacc1-penacc2
-
     utils = U(C, H, particip, M, nonsep)
 
-    bequestutils = beq(nextperiodassets, nonsep)
-
     call nextwage(age, W, M, hlogwage, ulogwage, hhgr, hugr, uhgr, uugr, wtpogood, wtpobad)
-    Evtgood = integral(age, nextperiodassets, wtpogood, nextperiodAIME, Vgood, Astate, Wstate, AIMEstate, currentB)
-    Evtbad = integral(age, nextperiodassets, wtpobad, nextperiodAIME, Vbad, Astate, Wstate, AIMEstate, currentB)
-    if(M == 0.0_8) then
-       Evtpo = ((1.0_8-mortality_good(age-30+1))*((1.0_8-good_to_bad(age-30+1))*Evtgood &
-            + good_to_bad(age-30+1)*Evtbad) + mortality_good(age-30+1)*bequestutils)
-    else if (M==1.0_8) then
-       Evtpo = ((1.0_8-mortality_bad(age-30+1))*((1.0_8-bad_to_bad(age-30+1))*Evtgood &
-            +bad_to_bad(age-30+1)*Evtbad) + mortality_bad(age-30+1)*bequestutils)
-    else
-       write(*,*) 'Health is neither 0 nor 1!!'
-       write(*,*) 'M=', M
-       !read*
-    end if
 
+    call compexp(age, M, nextperiodassets, wtpogood, wtpobad, nextperiodAIME, &
+         & Vgood, Vbad, Astate, Wstate, AIMEstate, currentB, &
+         & mortality_good, mortality_bad, good_to_bad, bad_to_bad, Evtpo)
+    
     val = utils + p_beta*Evtpo
 
     if (flag==1_1) then
