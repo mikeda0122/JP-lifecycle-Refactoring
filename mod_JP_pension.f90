@@ -8,7 +8,8 @@ contains
 
   !*******************Note***************************************
   !
-  !Although this is called AIME, it's just an accumulation of laborincome.
+  !Although this is called AIME,
+  !it's just an accumulation of laborincome, which is the amount of pension one can obtain in one year.
   !Thus, we need to adjust the range of AIME grids.
   !
   !

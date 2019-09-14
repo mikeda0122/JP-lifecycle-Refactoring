@@ -46,8 +46,7 @@ contains
     valopt = vpanish
 
     currentB = 1_8
-    PIA = computePIA(AIME)
-    ss = PIA
+    ss = AIME
 !    pb = predictpensionbenefits(PIA, age)
 !    pb = 2*pb
     pb = 0.0_8

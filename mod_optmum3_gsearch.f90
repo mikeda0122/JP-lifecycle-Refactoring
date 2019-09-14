@@ -40,8 +40,7 @@ contains
 
     valopt = -10000000000.0_8
 
-    PIA = computePIA(AIME)
-    ss = PIA
+    ss = AIME
 !    pb = predictpensionbenefits(PIA, age)
 !    pb = pb*2
     pb = 0.0_8
