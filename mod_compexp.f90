@@ -38,8 +38,8 @@ contains
        Evtbad = integral(age, nextperiodassets, wtpobad, nextperiodAIME, Vbad, Astate, Wstate, AIMEstate, currentB)
 
     else if (age < dieage) then
-       Evtgood = interp(age, nextperiodassets, 0.0_8, AIME, Vgood, Astate, Wstate, AIMEstate, Asnum, Wnum, AIMEnum, currentB)
-       Evtbad = interp(age, nextperiodassets, 0.0_8, AIME, Vbad, Astate, Wstate, AIMEstate, Asnum, Wnum, AIMEnum, currentB)
+       Evtgood = interp(age, nextperiodassets, 0.0_8, nextperiodAIME, Vgood, Astate, Wstate, AIMEstate, Asnum, Wnum, AIMEnum, currentB)
+       Evtbad = interp(age, nextperiodassets, 0.0_8, nextperiodAIME, Vbad, Astate, Wstate, AIMEstate, Asnum, Wnum, AIMEnum, currentB)
 
     else if (age==dieage) then
        Evtpo = bequestutils

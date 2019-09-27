@@ -97,7 +97,7 @@ contains
        write(*,*) '******'
        write(*,*) nextperiodAIME !!Astate, Wstate, AIMEstate, currentB
        val = vpanish
-    nnn   write(*,*) mortality_good(age-30+1)
+       write(*,*) mortality_good(age-30+1)
        write(*,*) 'asset', nextperiodassets, 'C', C
        write(*,*) 'H', H, 'particip', particip, 'currentB=', currentB
        write(*,*) 'M', M, 'nonsep', nonsep

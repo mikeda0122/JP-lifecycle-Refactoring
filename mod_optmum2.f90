@@ -88,7 +88,7 @@ contains
 
        utils = U(C, 0.0_8, 0_1, M, nonsep)
 
-       call compexp(age, M, nextperiodassets, 0.0_8, 0.0_8, nextperiodAIME, &
+       call compexp(age, M, nextperiodassets, 0.0_8, 0.0_8, AIME, &
        & Vgood, Vbad, Astate, Wstate, AIMEstate, currentB, &
        & mortality_good, mortality_bad, good_to_bad, bad_to_bad, Evtpo)
 

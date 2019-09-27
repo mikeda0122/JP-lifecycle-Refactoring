@@ -44,7 +44,7 @@ program main_run
   if (job==0_8) then
 !     open(unit=2, file='params/simulation_first_step_params.csv')
 !     open(unit=2, file='params/simulation_params_French_4.csv') 
-     open(unit=2, file='params/simulation_params_JP_019.csv') 
+     open(unit=2, file='params/simulation_params_JP.csv') 
 !     open(unit=2, file='params/initial_test.csv') 
 !     open(unit=2, file='params/simulation_params_JP_notied.csv') 
 !     open(unit=2,file='params/simulation_params_our_optimal.csv')

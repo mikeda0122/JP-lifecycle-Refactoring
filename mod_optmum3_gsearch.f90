@@ -37,7 +37,7 @@ contains
     real(8) :: PIA, ss, pb, laborincome, income, cashonhand
     real(8) :: nextperiodassets, utils, bequestutils
     real(8) :: MTR, reduc
-    real(8) :: Evtpo, val
+    real(8) :: val
 
     valopt = -10000000000.0_8
 
@@ -68,12 +68,9 @@ contains
 
        utils = U(C, 3.0_8, 0_1, M, nonsep)
 
-       call compexp(age, M, nextperiodassets, 0.0_8, 0.0_8, 0.0_8, &
-       & 0.0_8, 0.0_8, Astate, Wstate, AIMEstate, 0.0_8, &
-       & 0.0_8, 0.0_8, 0.0_8, 0.0_8, Evtpo)
-       !!We need to make sure whether the way I dealt with Vgood and Vbad is correct.
+       bequestutils = beq(nextperiodassets, nonsep)
 
-       val = utils + p_beta*Evtpo
+       val = utils + p_beta*bequestutils
 
        if (val > valopt) then
           Copt = C
